@@ -15,4 +15,4 @@
 ## Author
 
 - [瀬川龍哉(@RShirohara)](https://github.com/RShirohara)
-- 小出樹
+- [小出樹(@itsukikoide)](https://github.com/itsukikoide)
