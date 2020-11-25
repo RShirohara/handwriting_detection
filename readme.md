@@ -4,7 +4,7 @@
 
 題名: 「手書き文字認識による入力方式の開発」
 
-## To-Do
+## Working list
 
 [GitHub Projects](https://github.com/RShirohara/handwriting_detection/projects/1)
 
