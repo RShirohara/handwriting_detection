@@ -19,11 +19,11 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 
 ## Features
 
-- [ ] Hand Detection #1
-- [ ] Paper Detection #2
-- [ ] Character Detection #3
-- [ ] Text to Speak #4
-- [ ] Send Character #7
+- [ ] Hand Detection [#1](https://github.com/RShirohara/handwriting_detection/issues/1)
+- [ ] Paper Detection [#2](https://github.com/RShirohara/handwriting_detection/issues/2)
+- [ ] Character Detection [#3](https://github.com/RShirohara/handwriting_detection/issues/3)
+- [ ] Text to Speak [#4](https://github.com/RShirohara/handwriting_detection/issues/4)
+- [ ] Send Character [#7](https://github.com/RShirohara/handwriting_detection/issues/7)
 
 ## Requirement
 
@@ -32,6 +32,7 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 - [jetson-utils](https://github.com/dusty-nv/jetson-utils)
 - OpenCV 4.1.1 (installed on JetPack-4.4.1)
 - [tensorflow 2.3.1+nv20.11](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform-release-notes/tf-jetson-rel.html)
+- [tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
 
 ## Usage
 
