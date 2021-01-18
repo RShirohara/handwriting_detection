@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "tegaki"
+version = "0.1.0"
+description = ""
+authors = ["Ray Shirohara <RShirohara@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+Cython = "^0.29.21"
+numpy = "1.16.1"
+future = "0.18.2"
+mock = "3.0.5"
+h5py = "2.10.0"
+Keras-Preprocessing = "1.1.1"
+Keras-Applications = "1.0.8"
+scipy = "1.4.1"
+gast = "0.3.3"
+tensorflow = {url = "https://developer.download.nvidia.com/compute/redist/jp/v44/tensorflow/tensorflow-2.3.1+nv20.12-cp36-cp36m-linux_aarch64.whl"}
+pillow = {url = "https://files.pythonhosted.org/packages/73/59/3192bb3bc554ccbd678bdb32993928cb566dccf32f65dac65ac7e89eb311/Pillow-8.1.0.tar.gz"}
+kiwisolver = {url = "https://files.pythonhosted.org/packages/90/55/399ab9f2e171047d28933ae4b686d9382d17e6c09a01bead4a6f6b5038f4/kiwisolver-1.3.1.tar.gz"}
+pycocotools = "^2.0.2"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
