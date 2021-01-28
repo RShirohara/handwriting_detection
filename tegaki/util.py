@@ -1,12 +1,22 @@
 # -*- coding: utf-8 -*-
 # author: @RShirohara
 
-import cv2
+
 import threading
+from typing import NamedTuple, Union
+
+import cv2
+
+
+class CapParams(NamedTuple):
+    """Capture device params."""
+    source: Union[int, str]
+    width: int
+    height: int
 
 
 class VideoStream:
-    """Read source input with multithreading.
+    """Reading source with multithreading.
     This code is based on https://github.com/victordibia/handtracking.
 
     Attributes:
@@ -18,9 +28,9 @@ class VideoStream:
         """Initialize video stream.
 
         Args:
-            src (str): Source URI of video stream.
-            width (int): Width of the frames in video stream.
-            height (int): Height of the frames in video stream.
+            src (str, int): Source URI of the video stream.
+            width (int): Width of the frames in the video stream.
+            height (int): Height of the frames in the video stream.
         """
 
         self.stream = cv2.VideoCapture(src)
