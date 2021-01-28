@@ -535,6 +535,14 @@ cython = ">=0.27.3"
 matplotlib = ">=2.1.0"
 
 [[package]]
+name = "pydub"
+version = "0.24.1"
+description = "Manipulate audio with an simple and easy high level interface"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
 name = "pyparsing"
 version = "2.4.7"
 description = "Python parsing module"
@@ -758,7 +766,7 @@ testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-flake
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "f9a1d64933e43ac659b4952e52cf33dee4f62bebfd7157dff8398ba993c353a7"
+content-hash = "9f4226ec1a175db8ec779e64072c3b8f8e8e56903697f3f40b6099f8558fef33"
 
 [metadata.files]
 absl-py = [
@@ -1196,6 +1204,10 @@ pyasn1-modules = [
 ]
 pycocotools = [
     {file = "pycocotools-2.0.2.tar.gz", hash = "sha256:24717a12799b4471c2e54aa210d642e6cd4028826a1d49fcc2b0e3497e041f1a"},
+]
+pydub = [
+    {file = "pydub-0.24.1-py2.py3-none-any.whl", hash = "sha256:25fdfbbfd4c69363006a27c7bd2346c4b886a0dd3da264c14d858b71a9593284"},
+    {file = "pydub-0.24.1.tar.gz", hash = "sha256:630c68bfff9bb27cbc5e1f02923f717c3bc5f4d73fd685fda08b6ce90f76dc69"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
