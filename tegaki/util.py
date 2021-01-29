@@ -2,6 +2,7 @@
 # author: @RShirohara
 
 
+import queue
 import threading
 from typing import NamedTuple, Union
 
@@ -13,6 +14,39 @@ class CapParams(NamedTuple):
     source: Union[int, str]
     width: int
     height: int
+
+
+class EventQueue(queue.Queue):
+    """Queue wrapper.
+
+    Attributes:
+        status (Event): Used to indicate if a target process is executable.
+    """
+
+    def __init__(self, flag, maxsize=0):
+        """Initialize.
+
+        Args:
+            flag (Event): target Event.
+        """
+
+        super(EventQueue, self).__init__(maxsize=maxsize)
+        self.status = flag
+
+    def w_get(self, block=True, timeout=None):
+        """queue.get wrapper."""
+
+        get = self.get(block=block, timeout=timeout)
+        if self.empty():
+            self.status.clear()
+        return get
+
+    def w_put(self, item, block=True, timeout=None):
+        """queue.put wrapper."""
+
+        if self.empty():
+            self.status.set()
+        return self.put(item, block=block, timeout=timeout)
 
 
 class VideoStream:
@@ -68,4 +102,4 @@ class VideoStream:
         return self.stream.get(3), self.stream.read(4)
 
     def stop(self):
-        self.status.wait()
+        self.status.clear()
