@@ -86,7 +86,7 @@ def detect_paper(image_cv, thresh_level, max_area=100000):
         boxes (tuple): detected boxes
     """
 
-    image_gray = cv2.cvtColor(image_cv, cv.COLOR_BGR2GRAY)
+    image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
     _, image_gray = cv2.threshold(
         image_gray, thresh_level[0], thresh_level[1], cv2.THRESH_BINARY
     )
