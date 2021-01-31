@@ -1,18 +1,18 @@
 # 使用時設定等
 
-Linux特有の操作法などは記述しない。
+Linux特有の操作法などは記述しない。  
 
 ## bluetooth
 
-JetPack標準では動かない。
-ひと工夫が必要。
+JetPack標準では動かない。  
+ひと工夫が必要。  
 
 ### 1.usermodを使う(安全)
 
-bluetoothでaudio出力を使うためには$USERがlpグループに所属している必要がある。
+bluetoothでaudio出力を使うためには`$USER`が`lp`グループに所属している必要がある。  
 
 ```bash
-usermod -aG lp $USER
+$ usermod -aG lp $USER
 ```
 
 で追加 -> 再起動。
@@ -47,28 +47,23 @@ https://gist.github.com/kafene/32a07cac0373409e31f5bfe981eefb19
 
 ## Python
 
-手の検出にTensorFlow Object Detection APIを使用する。
-動作させるためにPython3.7以降が必要。
+手の検出にTensorFlow Object Detection APIを使用する。  
 
 ### Pyenv
 
-JetsonNano標準のPythonは3.6。
-3.7以降をインストールするために使用。
+JetsonNano標準のPythonは3.6.9。  
+3.6.12をインストールするために使用。  
 
 https://github.com/pyenv/pyenv
 
 ### Poetry
 
-依存パッケージ管理ツール。
-`./pyproject.toml`に設定が書いてある。
+依存パッケージ管理ツール。  
+`./pyproject.toml`に設定が書いてある。  
 
 https://github.com/python-poetry/poetry
 
 ### TensorFlow
 
-Pythonバージョンに対応したwheelが必要。
-
-https://github.com/PINTO0309/Tensorflow-bin
-
-`tensorflow-2.3.1-cp37-cp37m-linux_aarch64_download.sh`からGDriveのリンクからwheelを取得。
-`./wheels`以下に配置する。
+Pythonバージョンに対応したものを入れる。  
+poetryによって自動で入る。  

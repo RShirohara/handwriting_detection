@@ -2,7 +2,8 @@
 
 ## Description
 
-title: 「手書き文字認識による入力方式の開発」
+岩手県立産業技術短期大学校 電子技術科  
+2020年度卒業研究「手書き文字認識による入力方式の開発」  
 
 Google Cloud Visionを使用して手書き文字を検出する。  
 OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しない状態で紙を撮影する。  
@@ -22,17 +23,21 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 - [ ] Hand Detection [#1](https://github.com/RShirohara/handwriting_detection/issues/1)
 - [ ] Paper Detection [#2](https://github.com/RShirohara/handwriting_detection/issues/2)
 - [ ] Character Detection [#3](https://github.com/RShirohara/handwriting_detection/issues/3)
-- [ ] Text to Speak [#4](https://github.com/RShirohara/handwriting_detection/issues/4)
+- [x] Text to Speak [#4](https://github.com/RShirohara/handwriting_detection/issues/4)
 - [ ] Send Character [#7](https://github.com/RShirohara/handwriting_detection/issues/7)
 
 ## Requirement
 
 `Working`
 
-- [jetson-utils](https://github.com/dusty-nv/jetson-utils)
-- OpenCV 4.1.1 (installed on JetPack-4.4.1)
-- [tensorflow 2.3.1+nv20.11](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform-release-notes/tf-jetson-rel.html)
+- Python 3.6.12
+
+### Python Modules
+
+- opencv-python 4.4.0
+- [tensorflow 1.15.4+nv20.12](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform-release-notes/tf-jetson-rel.html)
 - [tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
+- pydub
 
 ## Usage
 
@@ -40,7 +45,13 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 
 ## Installation
 
-`Working`
+[詳細](./docs/install.md)
+
+### From source
+
+```Bash
+$ poetry install
+```
 
 ## Author
 
