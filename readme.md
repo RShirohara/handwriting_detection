@@ -35,8 +35,8 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 ### Python Modules
 
 - opencv-python 4.4.0
-- [tensorflow 1.15.4+nv20.12](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform-release-notes/tf-jetson-rel.html)
-- [tensorflow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
+- [TensorFlow 1.15.4+nv20.12](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform-release-notes/tf-jetson-rel.html)
+- [TensorFlow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
 - pydub
 
 ## Usage
