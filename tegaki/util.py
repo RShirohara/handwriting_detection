@@ -31,21 +31,21 @@ class EventQueue(queue.Queue):
         """
 
         super(EventQueue, self).__init__(maxsize=maxsize)
-        self.status = flag
+        self._status = flag
 
     def w_get(self, block=True, timeout=None):
         """queue.get wrapper."""
 
         get = self.get(block=block, timeout=timeout)
         if self.empty():
-            self.status.clear()
+            self._status.clear()
         return get
 
     def w_put(self, item, block=True, timeout=None):
         """queue.put wrapper."""
 
         if self.empty():
-            self.status.set()
+            self._status.set()
         return self.put(item, block=block, timeout=timeout)
 
 
@@ -58,7 +58,7 @@ class VideoStream:
         status (threading.Event): Used to indicate if the thread stopped.
     """
 
-    def __init__(self, src, width, height):
+    def __init__(self, src=0, width=640, height=320):
         """Initialize video stream.
 
         Args:
