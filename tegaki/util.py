@@ -71,6 +71,7 @@ class VideoStream:
 
         self.source = str(src)
         self.stream = cv2.VideoCapture(src)
+        self.status = Event()
 
         if width and height:
             self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
@@ -82,7 +83,7 @@ class VideoStream:
     def start(self):
         """Start the thread to read frames from cv2 stream."""
 
-        Thread(target=self.update, args=()).start()
+        Thread(target=self.update, args=(), daemon=True).start()
         return self
 
     def update(self):
