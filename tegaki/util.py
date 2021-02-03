@@ -2,8 +2,9 @@
 # author: @RShirohara
 
 
-import queue
-import threading
+from multiprocessing import get_context
+from multiprocessing.queues import Queue
+from threading import Event, Thread
 from typing import NamedTuple, Union
 
 import cv2
@@ -16,7 +17,7 @@ class CapParams(NamedTuple):
     height: int
 
 
-class EventQueue(queue.Queue):
+class EventQueue(Queue):
     """Queue wrapper.
 
     Attributes:
@@ -30,7 +31,7 @@ class EventQueue(queue.Queue):
             flag (Event): target Event.
         """
 
-        super(EventQueue, self).__init__(maxsize=maxsize)
+        super(EventQueue, self).__init__(ctx=get_context(), maxsize=maxsize)
         self._status = flag
 
     def w_get(self, block=True, timeout=None):
@@ -68,7 +69,7 @@ class VideoStream:
         """
 
         self.stream = cv2.VideoCapture(src)
-        self.status = threading.Event()
+        self.status = Event()
 
         self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
         self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
@@ -79,7 +80,7 @@ class VideoStream:
     def start(self):
         """Start the thread to read frames from cv2 stream."""
 
-        threading.Thread(target=self.update, args=()).start()
+        Thread(target=self.update, args=()).start()
         return self
 
     def update(self):
