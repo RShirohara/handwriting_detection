@@ -3,9 +3,14 @@
 # TODO: #1, #2, #3
 
 
+from multiprocessing import Process
+from threading import Event
+
 import cv2
 import numpy as np
 import tensorflow as tf
+
+from .util import EventQueue
 
 
 def load_inference_graph(root):
@@ -31,7 +36,7 @@ def load_inference_graph(root):
     return detection_graph, sess
 
 
-def detect_hands(image_np, detection_graph, sess):
+def detect_hands(image_np, detection_graph, sess, thresh=0.7):
     """Hand Detection.
     Generate scores and bounding boxes.
 
@@ -41,8 +46,7 @@ def detect_hands(image_np, detection_graph, sess):
         sess (Session): tf.Session object.
 
     Returns:
-        boxes (ndarray): Detected boxes.
-        scores (ndarray): Detected scores.
+        result (tuple[ndarray]): Detected boxes.
     """
 
     image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
@@ -56,7 +60,7 @@ def detect_hands(image_np, detection_graph, sess):
         'detection_classes:0'
     )
     num_detections = detection_graph.get_tensor_by_name(
-        'num_detection:0'
+        'num_detections:0'
     )
 
     image_np_expanded = np.expand_dims(image_np, axis=0)
@@ -71,19 +75,24 @@ def detect_hands(image_np, detection_graph, sess):
         feed_dict={image_tensor: image_np_expanded}
     )
 
-    return np.squeeze(boxes), np.squeeze(scores)
+    result = tuple([
+        x
+        for x, y in zip(np.squeeze(boxes), np.squeeze(scores))
+        if y >= thresh
+    ])
+    return result
 
 
-def detect_paper(image_cv, thresh_level, max_area=100000):
+def detect_paper(image_cv, thresh_level=(140, 255), max_area=100000):
     """Paper Detection.
     Generate bounding boxes.
 
     Args:
         image_cv (ndarray): Source image converted to BGR.
-        thresh_level (tuple[int]): Threshold of the grayscale. (max, min)
+        thresh (tuple[int]): Threshold of the grayscale. (max, min)
         max_area (int): Max area of the paper.
     Returns:
-        boxes (tuple): detected boxes
+        boxes (tuple): Detected boxes.
     """
 
     image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
@@ -94,16 +103,10 @@ def detect_paper(image_cv, thresh_level, max_area=100000):
         image_gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
     )[0]
 
-    boxes = []
-    areas = []
-    for c in contours:
-        area = cv2.contourArea(c)
-        epsilon = 0.1 * cv2.arcLength(c, True)
-        approx = cv2.approxPolyDP(c, epsilon, True)
-        if len(applox) == 4 and area >= max_area:
-            boxes.append(approx)
-            areas.append(area)
+    boxes = tuple([
+        cv2.approxPolyDP(c, 0.1*cv2.arcLength(c, True), True).ravel()
+        for c in contours
+        if cv2.contourArea(c) >= max_area
+    ])
 
-    boxes.sort(key=lambda x:areas, reverse=True)
-
-    return tuple(boxes)
+    return boxes
