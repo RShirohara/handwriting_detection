@@ -55,11 +55,12 @@ class VideoStream:
     This code is based on https://github.com/victordibia/handtracking.
 
     Attributes:
+        source (str): Device name.
         stream (VideoCapture): cv2.VideoCapture stream object.
-        status (threading.Event): Used to indicate if the thread stopped.
+        status (Event): Used to indicate if the thread stopped.
     """
 
-    def __init__(self, src=0, width=640, height=320):
+    def __init__(self, src=0, width=None, height=None):
         """Initialize video stream.
 
         Args:
@@ -68,13 +69,14 @@ class VideoStream:
             height (int): Height of the frames in the video stream.
         """
 
+        self.source = str(src)
         self.stream = cv2.VideoCapture(src)
-        self.status = Event()
 
-        self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
-        self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+        if width and height:
+            self.stream.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            self.stream.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
         (self.grabbed, self.frame) = self.stream.read()
-
         self.status.set()
 
     def start(self):
@@ -93,14 +95,14 @@ class VideoStream:
         """Return frame most recentry read."""
         return self.frame
 
-    def size(self):
-        """Return size of the capture device.
+    def info(self):
+        """Return info of the capture device.
 
         Returns:
-            (int, int): width, height
+            CapParams: Device name, width, and height.
         """
 
-        return self.stream.get(3), self.stream.read(4)
+        return CapParams(self.source, self.stream.get(3), self.stream.read(4))
 
     def stop(self):
         self.status.clear()
