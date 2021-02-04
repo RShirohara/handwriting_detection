@@ -86,7 +86,7 @@ class DetectText(Thread):
     Attributes:
         api (GoogleOCR): Google Cloud Vision api.
         stauts (Event): used to indicate if a thread can exec.
-        task (EventQueue[ndarray]): Queue to get source image converted to RGB.
+        task (EventQueue[ndarray]): Queue to get source image converted to BGR.
         result (EventQueue[DetectedText]): Queue pointer to send results.
     """
 
