@@ -5,14 +5,14 @@
 from multiprocessing import get_context
 from multiprocessing.queues import Queue
 from threading import Event, Thread
-from typing import NamedTuple, Union
+from typing import NamedTuple
 
 import cv2
 
 
 class CapParams(NamedTuple):
     """Capture device params."""
-    source: Union[int, str]
+    source: str
     width: int
     height: int
 
@@ -103,7 +103,7 @@ class VideoStream:
             CapParams: Device name, width, and height.
         """
 
-        return CapParams(self.source, self.stream.get(3), self.stream.read(4))
+        return CapParams(self.source, self.stream.get(3), self.stream.get(4))
 
     def stop(self):
         self.status.clear()
