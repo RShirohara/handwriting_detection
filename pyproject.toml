@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "tegaki"
-version = "0.1.0"
-description = ""
+version = "1.0.0"
+description = "HandWriting Detection"
 authors = ["Ray Shirohara <RShirohara@gmail.com>"]
 license = "MIT"
+repository = "https://github.com/RShirohara/handwriting_detection"
+
+[tool.poetry.scripts]
+tegaki = 'tegaki.cli:run'
 
 [tool.poetry.dependencies]
 python = "^3.6"
