@@ -2,8 +2,7 @@
 # author: @RShirohara
 
 
-from multiprocessing import get_context
-from multiprocessing.queues import Queue
+from queue import Queue
 from threading import Event, Thread
 from typing import NamedTuple
 
@@ -31,7 +30,7 @@ class EventQueue(Queue):
             flag (Event): target Event.
         """
 
-        super(EventQueue, self).__init__(ctx=get_context(), maxsize=maxsize)
+        super(EventQueue, self).__init__(maxsize=maxsize)
         self._status = flag
 
     def w_get(self, block=True, timeout=None):
