@@ -2,17 +2,62 @@
 
 ## Description
 
-題名: 「手書き文字認識による入力方式の開発」
+岩手県立産業技術短期大学校 電子技術科  
+2020年度卒業研究「手書き文字認識による入力方式の開発」  
+
+Google Cloud Visionを使用して手書き文字を検出する。  
+OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しない状態で紙を撮影する。  
+文字が書かれていた場合、Vision OCR APIで文字を検出する。  
+検出した文字をPCに送信し、音声読み上げも行う。  
+
+### Demo
+
+`ここにgifをいれる。`
 
 ## Working list
 
 [GitHub Projects](https://github.com/RShirohara/handwriting_detection/projects/1)
 
-## License
+## Features
 
-[The MIT License](./LICENSE)
+- [ ] Hand Detection [#1](https://github.com/RShirohara/handwriting_detection/issues/1)
+- [ ] Paper Detection [#2](https://github.com/RShirohara/handwriting_detection/issues/2)
+- [ ] Character Detection [#3](https://github.com/RShirohara/handwriting_detection/issues/3)
+- [x] Text to Speak [#4](https://github.com/RShirohara/handwriting_detection/issues/4)
+- [ ] Send Character [#7](https://github.com/RShirohara/handwriting_detection/issues/7)
+
+## Requirement
+
+`Working`
+
+- Python 3.6.12
+
+### Python Modules
+
+- opencv-python 4.4.0
+- [TensorFlow 1.15.4+nv20.12](https://docs.nvidia.com/deeplearning/frameworks/install-tf-jetson-platform-release-notes/tf-jetson-rel.html)
+- [TensorFlow Object Detection API](https://github.com/tensorflow/models/tree/master/research/object_detection)
+- pydub
+
+## Usage
+
+`Working`
+
+## Installation
+
+[詳細](./docs/install.md)
+
+### From source
+
+```Bash
+$ poetry install
+```
 
 ## Author
 
 - [瀬川龍哉(@RShirohara)](https://github.com/RShirohara)
 - [小出樹(@itsukikoide)](https://github.com/itsukikoide)
+
+## License
+
+[The MIT License](./LICENSE)
