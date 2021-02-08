@@ -27,7 +27,8 @@ class EventQueue(Queue):
         """Initialize.
 
         Args:
-            flag (Event): target Event.
+            flag (Event): Target Event.
+            maxsize (int): Upperbound limit on the item in the queue.
         """
 
         super(EventQueue, self).__init__(maxsize=maxsize)
