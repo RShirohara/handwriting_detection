@@ -19,7 +19,7 @@ class Tegaki:
         cap_params (CapParams): infomation of source device or file.
     """
 
-    def __init__(self, model_dir, src=0, width=None, height=None):
+    def __init__(self, model_dir, src=0, width=None, height=None, maxsize=0):
         """Initilize core class.
 
         Args:
@@ -27,6 +27,7 @@ class Tegaki:
             src (str, int): Path to capture device or file.
             width (int): Width of the frames in stream.
             height (int): Height of the frames in stream.
+            maxsize (int): Upperbound limit on the item in the queue.
         """
 
         self.capture = VideoStream(
@@ -34,14 +35,19 @@ class Tegaki:
         ).start()
         self.cap_params = self.capture.info()
 
-        self.th_play = PlayMP3(daemon=True)
-        self.th_tts = GetTTS(self.th_play.task, daemon=True)
-        self.th_ocr = DetectText(self.th_tts.task, daemon=True)
+        self.th_play = PlayMP3(daemon=True, maxsize=maxsize)
+        self.th_tts = GetTTS(self.th_play.task, daemon=True, maxsize=maxsize)
+        self.th_ocr = DetectText(
+            self.th_tts.task,
+            daemon=True,
+            maxsize=maxsize
+        )
         self.th_det = DetectArea(
             self.th_ocr.task,
             model_dir,
             self.cap_params,
-            daemon=True
+            daemon=True,
+            maxsize=maxsize
         )
 
     def run(self):

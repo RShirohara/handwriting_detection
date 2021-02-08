@@ -133,18 +133,19 @@ class DetectArea(Thread):
         result (EventQueue[ndarray]): Qurue pointer to send results.
     """
 
-    def __init__(self, result, model_dir, dev_info, daemon=None):
+    def __init__(self, result, model_dir, dev_info, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
             result (EventQueue[ndarray]): Queue pointer to send results.
             model_dir (str): Path to directory where tensorflow model exists.
             dev_info (CapParams): Capture device infomation.
+            maxsize (int): Upper bound limit on the item in the queue.
         """
 
         super(DetectArea, self).__init__(daemon=daemon)
         self.status = Event()
-        self.task = EventQueue(self.status)
+        self.task = EventQueue(self.status, maxsize=maxsize)
         self.result = result
         self.graph, self.sess = load_inference_graph(model_dir)
         self.dev_info = dev_info

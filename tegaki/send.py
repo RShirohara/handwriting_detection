@@ -31,11 +31,16 @@ class PlayMP3(Thread):
         task (EventQueue): Queue to get source audio.
     """
 
-    def __init__(self, daemon=None):
-        """Initialise."""
+    def __init__(self, maxsize=0, daemon=None):
+        """Initialize.
+
+        Args:
+            maxsize (int): Upperbound limit on the item in the queue.
+        """
+
         super(PlayMP3, self).__init__(daemon=daemon)
         self.status = Event()
-        self.task = EventQueue(self.status)
+        self.task = EventQueue(self.status, maxsize=maxsize)
 
     def run(self):
         """Run thread."""

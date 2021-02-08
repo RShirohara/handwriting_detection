@@ -90,17 +90,18 @@ class DetectText(Thread):
         result (EventQueue[DetectedText]): Queue pointer to send results.
     """
 
-    def __init__(self, result, daemon=None):
+    def __init__(self, result, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
             result (EventQueue[DetectedText]): Queue pointer to send results.
+            maxsize (int): Upperbound limit on the item in the queue.
         """
 
         super(DetectText, self).__init__(daemon=daemon)
         self.api = GoogleOCR()
         self.status = Event()
-        self.task = EventQueue(self.status)
+        self.task = EventQueue(self.status, maxsize=maxsize)
         self.result = result
 
     def run(self):
@@ -140,17 +141,18 @@ class GetTTS(Thread):
         result (EventQueue): Queue pointer to send results.
     """
 
-    def __init__(self, result, daemon=None):
+    def __init__(self, result, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
             result (EventQueue): Queue pointer to send results.
+            maxsize (int): Upperbound limit on the item in the queue.
         """
 
         super(GetTTS, self).__init__(daemon=daemon)
         self.api = GoogleTTS()
         self.status = Event()
-        self.task = EventQueue(self.status)
+        self.task = EventQueue(self.status, maxsize=maxsize)
         self.result = result
 
     def run(self):
