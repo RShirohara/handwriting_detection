@@ -41,13 +41,13 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 
 command: `tegaki [-h] [-i INPUT] [-m MAX_SIZE] [-g GOOGLE_CREDS] model`
 
-poritional:
-    `model`               Path to directory where the tensorflow model.
-optional:
-    `-h, --help`          Show help
-    `-i, --input`         Resource URI of the input stream.
-    `-m, --max_size`      Upperbound limit on the item in queue.
-    `-g, --google_creds`  Path to JSON file that contains your Google Cloud service accound key.
+- poritional:
+  - `model`               Path to directory where the tensorflow model.
+- optional:
+  - `-h, --help`          Show help
+  - `-i, --input`         Resource URI of the input stream.
+  - `-m, --max_size`      Upperbound limit on the item in queue.
+  - `-g, --google_creds`  Path to JSON file that contains your Google Cloud service accound key.
 
 ## Installation
 
