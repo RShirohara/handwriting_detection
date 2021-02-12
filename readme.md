@@ -20,15 +20,13 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 
 ## Features
 
-- [ ] Hand Detection [#1](https://github.com/RShirohara/handwriting_detection/issues/1)
-- [ ] Paper Detection [#2](https://github.com/RShirohara/handwriting_detection/issues/2)
-- [ ] Character Detection [#3](https://github.com/RShirohara/handwriting_detection/issues/3)
+- [x] Hand Detection [#1](https://github.com/RShirohara/handwriting_detection/issues/1)
+- [x] Paper Detection [#2](https://github.com/RShirohara/handwriting_detection/issues/2)
+- [x] Character Detection [#3](https://github.com/RShirohara/handwriting_detection/issues/3)
 - [x] Text to Speak [#4](https://github.com/RShirohara/handwriting_detection/issues/4)
 - [ ] Send Character [#7](https://github.com/RShirohara/handwriting_detection/issues/7)
 
 ## Requirement
-
-`Working`
 
 - Python 3.6.12
 
@@ -41,7 +39,15 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 
 ## Usage
 
-`Working`
+command: `tegaki [-h] [-i INPUT] [-m MAX_SIZE] [-g GOOGLE_CREDS] model`
+
+poritional:
+    `model`               Path to directory where the tensorflow model.
+optional:
+    `-h, --help`          Show help
+    `-i, --input`         Resource URI of the input stream.
+    `-m, --max_size`      Upperbound limit on the item in queue.
+    `-g, --google_creds`  Path to JSON file that contains your Google Cloud service accound key.
 
 ## Installation
 
@@ -49,7 +55,9 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 
 ### From source
 
-```Bash
+```bash
+$ git clone https://github.com/RShirohara/handwriting_detection
+$ cd handwriting_detection
 $ poetry install
 ```
 
