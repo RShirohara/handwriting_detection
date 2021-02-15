@@ -64,7 +64,6 @@ $ pip install poetry
 ```bash
 $ git clone https://github.com/RShirohara/handwriting_detection
 $ cd handwriting_detection
-$ wget https://github.com/RShirohara/handwriting_detection/releases/download/object-detection-2102/object_detection-0.1-py3-none-any.whl -P wheels
 $ poetry install
 ```
 
