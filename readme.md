@@ -42,16 +42,22 @@ OpenCVで紙を、TensorFlowで手を検出し、紙の上に手が存在しな�
 command: `tegaki [-h] [-i INPUT] [-m MAX_SIZE] [-g GOOGLE_CREDS] model`
 
 - poritional:
-  - `model`               Path to directory where the tensorflow model.
+  - `model`               訓練済みモデルが存在するディレクトリのパス。
 - optional:
-  - `-h, --help`          Show help
-  - `-i, --input`         Resource URI of the input stream.
-  - `-m, --max_size`      Upperbound limit on the item in queue.
-  - `-g, --google_creds`  Path to JSON file that contains your Google Cloud service accound key.
+  - `-h, --help`          Show help.
+  - `-i, --input`         入力デバイスのパス。
+  - `-m, --max_size`      tasklistの上限値。
+  - `-g, --google_creds`  Google Cloud サービスアカウントキーのパス。
 
 ## Installation
 
-[詳細](./docs/install.md)
+### Requiment
+
+```bash
+$ sudo apt update && sudo apt upgrade
+$ sudo apt install libhdf5-serial-dev hdf5-tools libhdf5-dev zlib1g-dev zip libjpeg8-dev liblapack-dev libblas-dev gfortran libffi-dev openssl-dev protobuf-compiler libxslt1-dev
+$ pip install poetry
+```
 
 ### From source
 
@@ -60,6 +66,8 @@ $ git clone https://github.com/RShirohara/handwriting_detection
 $ cd handwriting_detection
 $ poetry install
 ```
+
+Detail(詳細): [docs/install.md](./docs/install.md)
 
 ## Author
 
