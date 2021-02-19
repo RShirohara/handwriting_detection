@@ -3,7 +3,7 @@
 # TODO: #8
 
 
-import time
+from time import sleep
 
 from .detect import DetectArea
 from .googleapis import DetectText, GetTTS
@@ -36,14 +36,14 @@ class Tegaki:
         self.cap_params = self.capture.info()
 
         self.th_play = PlayMP3(daemon=True, maxsize=maxsize)
-        self.th_tts = GetTTS(self.th_play.task, daemon=True, maxsize=maxsize)
+        self.th_tts = GetTTS(self.th_play, daemon=True, maxsize=maxsize)
         self.th_ocr = DetectText(
-            self.th_tts.task,
+            self.th_tts,
             daemon=True,
             maxsize=maxsize
         )
         self.th_det = DetectArea(
-            self.th_ocr.task,
+            self.th_ocr,
             model_dir,
             self.cap_params,
             daemon=True,
@@ -59,6 +59,5 @@ class Tegaki:
         self.th_det.start()
 
         while True:
-            self.th_det.task.w_put(self.capture.read())
-            if self.th_tts.status.is_set():
-                time.sleep(10)
+            self.th_det.put(self.capture.read())
+            sleep(5)

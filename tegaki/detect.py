@@ -3,14 +3,13 @@
 # TODO: #1, #2, #3
 
 
-from threading import Event, Thread
 from typing import NamedTuple
 
 import cv2
 import numpy as np
 import tensorflow as tf
 
-from .util import EventQueue
+from .util import EventThread
 
 
 class DetectedGrid(NamedTuple):
@@ -124,29 +123,29 @@ def detect_paper(image_cv, thresh_level=(140, 255), max_area=100000):
     return boxes
 
 
-class DetectArea(Thread):
+class DetectArea(EventThread):
     """Detect paper and hands with multiprocessing.
 
     Attributes.
-        status (Event): Used to indicate if a thread can exec.
-        task (EventQueue[ndarray]): Queue to get source image converted to BGR.
-        result (EventQueue[ndarray]): Qurue pointer to send results.
+        status (bool): Used to indicate if a thread can exec.
+        result (Queue[ndarray]): Pointer used to send results.
     """
 
     def __init__(self, result, model_dir, dev_info, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
-            result (EventQueue[ndarray]): Queue pointer to send results.
+            result (Queue[ndarray]): Queue pointer to send results.
             model_dir (str): Path to directory where tensorflow model exists.
             dev_info (CapParams): Capture device infomation.
             maxsize (int): Upper bound limit on the item in the queue.
         """
 
-        super(DetectArea, self).__init__(daemon=daemon)
-        self.status = Event()
-        self.task = EventQueue(self.status, maxsize=maxsize)
-        self.result = result
+        super(DetectArea, self).__init__(
+            result=result,
+            maxsize=maxsize,
+            daemon=daemon
+        )
         self.graph, self.sess = load_inference_graph(model_dir)
         self.dev_info = dev_info
 
@@ -156,7 +155,7 @@ class DetectArea(Thread):
         while True:
             if not self.status.is_set():
                 self.status.wait()
-            source = self.task.w_get()
+            source = self.get()
 
             paper = detect_paper(source)
             if not paper:
@@ -202,6 +201,6 @@ class DetectArea(Thread):
                     _result.append(tuple(_res))
 
             if (True, True) in _result:
-                self.result.w_put(source)
+                self.result.put(source)
 
         self.sess.close()

@@ -16,38 +16,53 @@ class CapParams(NamedTuple):
     height: int
 
 
-class EventQueue(Queue):
-    """Queue wrapper.
+class EventThread(Thread):
+    """threading.Thread wrapper.
 
     Attributes:
-        status (Event): Used to indicate if a target process is executable.
+        status (Event): Used to indicate if a thread can exec.
+        result (EventThread): Pointer used to send results.
+
+        _task (Queue): Used to get tasks.
+                       Hidden for consistency with self.status.
+                       You must use self.get and self.put for access.
     """
 
-    def __init__(self, flag, maxsize=0):
+    def __init__(self, result=None, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
-            flag (Event): Target Event.
+            result (EventThread): Pointer used to send results.
             maxsize (int): Upperbound limit on the item in the queue.
+            daemon (bool): Used to set daemonize.
         """
 
-        super(EventQueue, self).__init__(maxsize=maxsize)
-        self._status = flag
+        super(EventThread, self).__init__(daemon=daemon)
+        self._task = Queue(maxsize=maxsize)
+        self.status = Event()
 
-    def w_get(self, block=True, timeout=None):
+        if result:
+            self.result = result
+
+    def get(self, block=True, timeout=None):
         """queue.get wrapper."""
 
-        get = self.get(block=block, timeout=timeout)
-        if self.empty():
-            self._status.clear()
+        get = self._task.get(block=block, timeout=timeout)
+        if self._task.empty():
+            self.status.clear()
         return get
 
-    def w_put(self, item, block=True, timeout=None):
+    def put(self, item, block=True, timeout=None):
         """queue.put wrapper."""
 
-        if self.empty():
-            self._status.set()
-        return self.put(item, block=block, timeout=timeout)
+        if self._task.empty():
+            self.status.set()
+        self._task.put(item, block=block, timeout=timeout)
+
+    def run(self):
+        """Run thread."""
+
+        pass
 
 
 class VideoStream:

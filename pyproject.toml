@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "tegaki"
-version = "1.0.0"
+version = "0.1.1"
 description = "HandWriting Detection"
 authors = ["Ray Shirohara <RShirohara@gmail.com>"]
 license = "MIT"
