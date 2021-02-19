@@ -19,6 +19,8 @@ def play_audio(source):
         source (bytes): Source audio conveted to MP3.
     """
 
+    if not source:
+        return
     audio = AudioSegment.from_file(io.BytesIO(source), format='mp3')
     play(audio)
 
@@ -49,4 +51,5 @@ class PlayMP3(Thread):
             if not self.status.is_set():
                 self.status.wait()
             src = self.task.w_get()
-            play_audio(src)
+            if src:
+                play_audio(src)
