@@ -2,7 +2,7 @@
 # author: @RShirohara
 
 
-from queue import Queue
+from queue import Queue, Empty
 from threading import Event, Thread
 from typing import NamedTuple
 
@@ -33,7 +33,7 @@ class EventThread(Thread):
 
         Args:
             result (EventThread): Pointer used to send results.
-            maxsize (int): Upperbound limit on the item in the queue.
+            maxsize (int): Upperbound limit on the item in the Queue.
             daemon (bool): Used to set daemonize.
         """
 
@@ -45,7 +45,7 @@ class EventThread(Thread):
             self.result = result
 
     def get(self, block=True, timeout=None):
-        """queue.get wrapper."""
+        """Queue.get wrapper."""
 
         get = self._task.get(block=block, timeout=timeout)
         if self._task.empty():
@@ -53,7 +53,7 @@ class EventThread(Thread):
         return get
 
     def put(self, item, block=True, timeout=None):
-        """queue.put wrapper."""
+        """Queue.put wrapper."""
 
         if self._task.empty():
             self.status.set()
@@ -63,6 +63,57 @@ class EventThread(Thread):
         """Run thread."""
 
         pass
+
+
+class QueueSplitter:
+    """Queue splitter.
+
+    Attribures:
+        target (list[Queue]): Target queues.
+    """
+
+    def __init__(self, target):
+        """Initialize.
+
+        Args:
+            target (list[Queue]): Target queues.
+        """
+
+        self.target = target
+
+    def qsize(self):
+        """Queue.qsize wrapper."""
+        return tuple(
+            [t.qsize() for t in self.target]
+        )
+
+    def empty(self):
+        """Queue.empty wrapper."""
+        return tuple(
+            [t.empty() for t in self.target]
+        )
+
+    def full(self):
+        """Queue.full wrapper."""
+        return tuple(
+            [t.full() for t in self.target]
+        )
+
+    def put(self, item, block=True, timeout=None):
+        """Queue.put wrapper."""
+        for t in self.target:
+            t.put(item, block=block, timeout=timeout)
+
+    def get(self, block=True, timeout=None):
+        """Queue.get wrapper."""
+        _res = []
+        for t in self.target:
+            try:
+                _r = t.get(block=block, timeout=timeout)
+            except Empty:
+                _r = None
+            _res.append(_r)
+        return tuple(_res)
 
 
 class VideoStream:
