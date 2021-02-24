@@ -8,7 +8,7 @@ from time import sleep
 from .detect import DetectArea
 from .googleapis import DetectText, GetTTS
 from .send import PlayMP3
-from .util import VideoStream, QueueSplitter
+from .util import VideoStream, QueueConnector
 
 
 class Tegaki:
@@ -37,7 +37,7 @@ class Tegaki:
 
         self.th_play = PlayMP3(daemon=True, maxsize=maxsize)
         self.th_tts = GetTTS(
-            QueueSplitter([self.th_play]),
+            QueueConnector([self.th_play]),
             daemon=True,
             maxsize=maxsize
         )

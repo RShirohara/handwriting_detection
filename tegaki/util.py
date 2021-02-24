@@ -65,8 +65,8 @@ class EventThread(Thread):
         pass
 
 
-class QueueSplitter:
-    """Queue splitter.
+class QueueConnector:
+    """Queue connector with multiple inputs and outputs.
 
     Attribures:
         target (list[Queue]): Target queues.
