@@ -83,33 +83,27 @@ class QueueConnector:
 
     def qsize(self):
         """Queue.qsize wrapper."""
-        return tuple(
-            [t.qsize() for t in self.target]
-        )
+        return tuple(_t.qsize() for _t in self.target)
 
     def empty(self):
         """Queue.empty wrapper."""
-        return tuple(
-            [t.empty() for t in self.target]
-        )
+        return tuple(_t.empty() for _t in self.target)
 
     def full(self):
         """Queue.full wrapper."""
-        return tuple(
-            [t.full() for t in self.target]
-        )
+        return tuple(_t.full() for _t in self.target)
 
     def put(self, item, block=True, timeout=None):
         """Queue.put wrapper."""
-        for t in self.target:
-            t.put(item, block=block, timeout=timeout)
+        for _t in self.target:
+            _t.put(item, block=block, timeout=timeout)
 
     def get(self, block=True, timeout=None):
         """Queue.get wrapper."""
         _res = []
-        for t in self.target:
+        for _t in self.target:
             try:
-                _r = t.get(block=block, timeout=timeout)
+                _r = _t.get(block=block, timeout=timeout)
             except Empty:
                 _r = None
             _res.append(_r)
