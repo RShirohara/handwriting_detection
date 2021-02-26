@@ -36,10 +36,7 @@ def get_args():
 def run():
     args = get_args()
     if args.google_creds:
-        os.putenv(
-            'GOOGLE_APPLICATION_CREDENTIALS',
-            args.google_creds
-        )
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = args.google_creds
 
     core = tegaki.Tegaki(
         model_dir=args.model,

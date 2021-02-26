@@ -2,7 +2,7 @@
 # author: @RShirohara
 
 
-from queue import Queue
+from queue import Queue, Empty
 from threading import Event, Thread
 from typing import NamedTuple
 
@@ -16,38 +16,98 @@ class CapParams(NamedTuple):
     height: int
 
 
-class EventQueue(Queue):
-    """Queue wrapper.
+class EventThread(Thread):
+    """threading.Thread wrapper.
 
     Attributes:
-        status (Event): Used to indicate if a target process is executable.
+        status (Event): Used to indicate if a thread can exec.
+        result (EventThread): Pointer used to send results.
+
+        _task (Queue): Used to get tasks.
+                       Hidden for consistency with self.status.
+                       You must use self.get and self.put for access.
     """
 
-    def __init__(self, flag, maxsize=0):
+    def __init__(self, result=None, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
-            flag (Event): Target Event.
-            maxsize (int): Upperbound limit on the item in the queue.
+            result (EventThread): Pointer used to send results.
+            maxsize (int): Upperbound limit on the item in the Queue.
+            daemon (bool): Used to set daemonize.
         """
 
-        super(EventQueue, self).__init__(maxsize=maxsize)
-        self._status = flag
+        super(EventThread, self).__init__(daemon=daemon)
+        self._task = Queue(maxsize=maxsize)
+        self.status = Event()
 
-    def w_get(self, block=True, timeout=None):
-        """queue.get wrapper."""
+        if result:
+            self.result = result
 
-        get = self.get(block=block, timeout=timeout)
-        if self.empty():
-            self._status.clear()
+    def get(self, block=True, timeout=None):
+        """Queue.get wrapper."""
+
+        get = self._task.get(block=block, timeout=timeout)
+        if self._task.empty():
+            self.status.clear()
         return get
 
-    def w_put(self, item, block=True, timeout=None):
-        """queue.put wrapper."""
+    def put(self, item, block=True, timeout=None):
+        """Queue.put wrapper."""
 
-        if self.empty():
-            self._status.set()
-        return self.put(item, block=block, timeout=timeout)
+        if self._task.empty():
+            self.status.set()
+        self._task.put(item, block=block, timeout=timeout)
+
+    def run(self):
+        """Run thread."""
+
+        pass
+
+
+class QueueConnector:
+    """Queue connector with multiple inputs and outputs.
+
+    Attribures:
+        target (list[Queue]): Target queues.
+    """
+
+    def __init__(self, target):
+        """Initialize.
+
+        Args:
+            target (list[Queue]): Target queues.
+        """
+
+        self.target = target
+
+    def qsize(self):
+        """Queue.qsize wrapper."""
+        return tuple(_t.qsize() for _t in self.target)
+
+    def empty(self):
+        """Queue.empty wrapper."""
+        return tuple(_t.empty() for _t in self.target)
+
+    def full(self):
+        """Queue.full wrapper."""
+        return tuple(_t.full() for _t in self.target)
+
+    def put(self, item, block=True, timeout=None):
+        """Queue.put wrapper."""
+        for _t in self.target:
+            _t.put(item, block=block, timeout=timeout)
+
+    def get(self, block=True, timeout=None):
+        """Queue.get wrapper."""
+        _res = []
+        for _t in self.target:
+            try:
+                _r = _t.get(block=block, timeout=timeout)
+            except Empty:
+                _r = None
+            _res.append(_r)
+        return tuple(_res)
 
 
 class VideoStream:

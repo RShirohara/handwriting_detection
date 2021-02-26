@@ -2,13 +2,12 @@
 # author: @RShirohara
 
 
-from threading import Event, Thread
 from typing import NamedTuple
 
 import cv2
 from google.cloud import texttospeech, vision
 
-from .util import EventQueue
+from .util import EventThread
 
 
 class DetectedText(NamedTuple):
@@ -80,29 +79,31 @@ class GoogleTTS:
         return responce.audio_content
 
 
-class DetectText(Thread):
+class DetectText(EventThread):
     """Detect text with multithreading.
 
     Attributes:
         api (GoogleOCR): Google Cloud Vision api.
-        stauts (Event): used to indicate if a thread can exec.
-        task (EventQueue[ndarray]): Queue to get source image converted to BGR.
-        result (EventQueue[DetectedText]): Queue pointer to send results.
+        stauts (Event): Used to indicate if a thread can exec.
+        task (Queue[ndarray]): Used to get source image converted to BGR.
+        result (Queue[DetectedText]): Pointer used to send results.
     """
 
     def __init__(self, result, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
-            result (EventQueue[DetectedText]): Queue pointer to send results.
+            result (Queue[DetectedText]): Pointer used to send results.
             maxsize (int): Upperbound limit on the item in the queue.
+            daemon (bool): Used to set daemonize.
         """
 
-        super(DetectText, self).__init__(daemon=daemon)
+        super(DetectText, self).__init__(
+            result=result,
+            maxsize=maxsize,
+            daemon=daemon,
+        )
         self.api = GoogleOCR()
-        self.status = Event()
-        self.task = EventQueue(self.status, maxsize=maxsize)
-        self.result = result
 
     def run(self):
         """Run thread."""
@@ -113,7 +114,7 @@ class DetectText(Thread):
         while True:
             if not self.status.is_set():
                 self.status.wait()
-            task = self.task.w_get()
+            task = self.get()
             res = self.api.get(cv2.imencode('.jpg', task)[1].tobytes())
 
             for page in res.pages:
@@ -127,33 +128,34 @@ class DetectText(Thread):
 
             for p in _para:
                 if not set(p) in _before:
-                    self.result.w_put(DetectedText(''.join(p)))
+                    self.result.put(DetectedText(''.join(p)))
                     _before.append(set(p))
 
 
-class GetTTS(Thread):
+class GetTTS(EventThread):
     """Get Syntheshis speech with multithreading.
 
     Attributes:
         api (GoogleTTS): Google Text-to-Speech api.
         status (Event): Used to indicate if a thread can exec.
-        task (EventQueue[DetectedText]): Queue to get source text.
-        result (EventQueue): Queue pointer to send results.
+        result (EventQueue): Pointer used to send results.
     """
 
     def __init__(self, result, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
-            result (EventQueue): Queue pointer to send results.
+            result (Queue): Pointer used to send results.
             maxsize (int): Upperbound limit on the item in the queue.
+            daemon (bool): Used to set daemonize.
         """
 
-        super(GetTTS, self).__init__(daemon=daemon)
+        super(GetTTS, self).__init__(
+            result=result,
+            maxsize=maxsize,
+            daemon=daemon
+        )
         self.api = GoogleTTS()
-        self.status = Event()
-        self.task = EventQueue(self.status, maxsize=maxsize)
-        self.result = result
 
     def run(self):
         """Run thread."""
@@ -161,6 +163,6 @@ class GetTTS(Thread):
         while True:
             if not self.status.is_set():
                 self.status.wait()
-            task = self.task.w_get()
+            task = self.get()
             res = self.api.get(task.text, lang=task.lang)
-            self.result.w_put(res)
+            self.result.put(res)

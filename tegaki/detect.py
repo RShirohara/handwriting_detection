@@ -1,16 +1,14 @@
 # -*- coding: utf-8 -*-
 # author: @RShirohara
-# TODO: #1, #2, #3
 
 
-from threading import Event, Thread
 from typing import NamedTuple
 
 import cv2
 import numpy as np
 import tensorflow as tf
 
-from .util import EventQueue
+from .util import EventThread
 
 
 class DetectedGrid(NamedTuple):
@@ -48,7 +46,7 @@ def load_inference_graph(root):
     return detection_graph, sess
 
 
-def detect_hands(image_np, detection_graph, sess, thresh=0.7):
+def detect_hands(image_np, detection_graph, sess, dev_info, thresh=0.7):
     """Hand Detection.
     Generate scores and bounding boxes.
 
@@ -56,9 +54,10 @@ def detect_hands(image_np, detection_graph, sess, thresh=0.7):
         image_np (ndarray): Source image converted to RGB.
         detection_graph (Graph): tf.Graph object.
         sess (Session): tf.Session object.
+        dev_info (CapParams): Capture device infomation.
 
     Returns:
-        tuple[ndarray]: Detected boxes.
+        tuple[DetectedGrid]: Detected boxes.
     """
 
     image_tensor = detection_graph.get_tensor_by_name('image_tensor:0')
@@ -87,25 +86,39 @@ def detect_hands(image_np, detection_graph, sess, thresh=0.7):
         feed_dict={image_tensor: image_np_expanded}
     )
 
-    result = tuple([
+    _raw_grids = (
         x
         for x, y in zip(np.squeeze(boxes), np.squeeze(scores))
         if y >= thresh
-    ])
-    return result
+    )
+
+    return tuple(
+        DetectedGrid(
+            int(_r[1] * dev_info.width),
+            int(_r[3] * dev_info.width),
+            int(_r[0] * dev_info.height),
+            int(_r[2] * dev_info.height)
+        )
+        for _r in _raw_grids
+        if _raw_grids
+    )
 
 
-def detect_paper(image_cv, thresh_level=(140, 255), max_area=100000):
+def detect_paper(image_cv, dev_info, thresh_level=(140, 255), max_area=100000):
     """Paper Detection.
     Generate bounding boxes.
 
     Args:
         image_cv (ndarray): Source image converted to BGR.
-        thresh (tuple[int]): Threshold of the grayscale. (max, min)
+        dev_info (CapParams): Capture device infomation.
+        thresh_level (tuple[int]): Threshold of the grayscale. (max, min)
         max_area (int): Max area of the paper.
+
     Returns:
-        tuple[ndarray]: Detected boxes.
+        tuple[DetectedGrid]: Detected boxes.
     """
+
+    _thresh_grid = (dev_info.width / 10, dev_info.height / 10)
 
     image_gray = cv2.cvtColor(image_cv, cv2.COLOR_BGR2GRAY)
     _, image_gray = cv2.threshold(
@@ -115,38 +128,86 @@ def detect_paper(image_cv, thresh_level=(140, 255), max_area=100000):
         image_gray, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE
     )[0]
 
-    boxes = tuple([
+    _raw_grids = tuple(
         cv2.approxPolyDP(c, 0.1*cv2.arcLength(c, True), True).ravel()
         for c in contours
         if cv2.contourArea(c) >= max_area
-    ])
+    )
 
-    return boxes
+    _result = (
+        DetectedGrid(
+            min(_r[::2]),
+            max(_r[::2]),
+            min(_r[1::2]),
+            max(_r[1::2])
+        )
+        for _r in _raw_grids
+        if _raw_grids
+    )
+
+    return tuple(
+        _r
+        for _r in _result
+        if (
+            _r.xmin > _thresh_grid[0] and
+            _r.xmax < (dev_info.width - _thresh_grid[0]) and
+            _r.ymin > _thresh_grid[1] and
+            _r.ymax < (dev_info.height - _thresh_grid[1])
+        )
+    )
 
 
-class DetectArea(Thread):
+def _check_grid(paper, hands):
+    """Check grids.
+
+    Args:
+        paper (iter[DetectedGrid]): Papers grid.
+        hands (iter[DetectedGrid]): Hands grid.
+    Returns:
+        tuple[tuple[bool]]: Results.
+    """
+
+    _results = tuple(
+        tuple(
+            True
+            if not (
+                _p[0] < _h[0] < _h[1] < _p[1] or
+                _h[0] < _p[0] < _p[1] < _h[1] or
+                _p[0] < _h[0] < _p[1] < _h[1] or
+                _h[0] < _p[0] < _h[1] < _p[1]
+            )
+            else False
+            for _p, _h in zip(_pa.get(), _ha.get())
+        )
+        for _ha in hands
+        for _pa in paper
+    )
+    return _results
+
+
+class DetectArea(EventThread):
     """Detect paper and hands with multiprocessing.
 
     Attributes.
-        status (Event): Used to indicate if a thread can exec.
-        task (EventQueue[ndarray]): Queue to get source image converted to BGR.
-        result (EventQueue[ndarray]): Qurue pointer to send results.
+        status (bool): Used to indicate if a thread can exec.
+        result (Queue[ndarray]): Pointer used to send results.
     """
 
     def __init__(self, result, model_dir, dev_info, maxsize=0, daemon=None):
         """Initialize.
 
         Args:
-            result (EventQueue[ndarray]): Queue pointer to send results.
+            result (Queue[ndarray]): Queue pointer to send results.
             model_dir (str): Path to directory where tensorflow model exists.
             dev_info (CapParams): Capture device infomation.
             maxsize (int): Upper bound limit on the item in the queue.
         """
 
-        super(DetectArea, self).__init__(daemon=daemon)
-        self.status = Event()
-        self.task = EventQueue(self.status, maxsize=maxsize)
-        self.result = result
+        super(DetectArea, self).__init__(
+            result=result,
+            maxsize=maxsize,
+            daemon=daemon
+        )
         self.graph, self.sess = load_inference_graph(model_dir)
         self.dev_info = dev_info
 
@@ -156,52 +217,14 @@ class DetectArea(Thread):
         while True:
             if not self.status.is_set():
                 self.status.wait()
-            source = self.task.w_get()
+            source = self.get()
 
-            paper = detect_paper(source)
-            if not paper:
-                continue
+            _result = _check_grid(
+                detect_paper(source, self.dev_info),
+                detect_hands(source, self.graph, self.sess, self.dev_info)
+            )
 
-            hands = detect_hands(source, self.graph, self.sess)
-            if not hands:
-                continue
-
-            paper_grid = tuple([
-                DetectedGrid(
-                    min(p[::2]),
-                    max(p[::2]),
-                    min(p[1::2]),
-                    max(p[1::2])
-                )
-                for p in paper
-            ])
-            hands_grid = tuple([
-                DetectedGrid(
-                    int(h[1] * self.dev_info.width),
-                    int(h[3] * self.dev_info.width),
-                    int(h[0] * self.dev_info.height),
-                    int(h[2] * self.dev_info.height)
-                )
-                for h in hands
-            ])
-
-            _result = []
-            for pa in paper_grid:
-                for ha in hands_grid:
-                    _res = []
-                    for p, h in zip(pa.get(), ha.get()):
-                        if not (
-                            p[0] < h[0] < h[1] < p[1] and
-                            h[0] < p[0] < p[1] < h[1] and
-                            p[0] < h[0] < p[1] < h[1] and
-                            h[0] < p[0] < h[1] < p[1]
-                        ):
-                            _res.append(True)
-                        else:
-                            _res.append(False)
-                    _result.append(tuple(_res))
-
-            if (True, True) in _result:
-                self.result.w_put(source)
+            if (False, False) not in _result:
+                self.result.put(source)
 
         self.sess.close()

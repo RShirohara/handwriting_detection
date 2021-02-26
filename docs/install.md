@@ -63,8 +63,8 @@ TensorFlowのバージョン変更などで再ビルドする際は以下の通�
 
     ```diff
     @@ -27 +27 @@ tensorflow = {url = "https://developer.download.nvidia.com/ compute/redist/jp/v44
-    -object-detection = {path = "wheels/object_detection-0.1-py3-none-any.whl"}
-    +object-detection = {url = "https://github.com/RShirohara/  handwriting_detection/releases/download/object-detection-2102/  object_detection-0.1-py3-none-any.whl"}
+    -object-detection = {url = "https://github.com/RShirohara/handwriting_detection/releases/download/object-detection-2102/  object_detection-0.1-py3-none-any.whl"}
+    +object-detection = {path = "wheels/object_detection-0.1-py3-none-any.whl"}
     ```
 
 ## Build Package
