@@ -71,8 +71,8 @@ Detail(詳細): [docs/install.md](./docs/install.md)
 
 ## Author
 
-- [瀬川龍哉(@RShirohara)](https://github.com/RShirohara)
-- [小出樹(@itsukikoide)](https://github.com/itsukikoide)
+- [@RShirohara](https://github.com/RShirohara)
+- [@itsukikoide](https://github.com/itsukikoide)
 
 ## License
 
