@@ -1,5 +1,8 @@
 # HandWriting Detection
 
+> **Note**: This module is archived.  
+> このリポジトリに書かれているビルド方法等は2021-03時点のものです。
+
 ## Description
 
 岩手県立産業技術短期大学校 電子技術科  
